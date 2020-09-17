@@ -32,7 +32,6 @@ export const http = ({
   typeof onRequest === 'function' && socket.on('request', onRequest)
   typeof onUpgrade === 'function' && socket.on('upgrade', onUpgrade)
   socket.listen(options)
-
   if (async === true) {
     return new Promise((resolve, reject) => {
       socket.once('listening', () => {
@@ -72,7 +71,6 @@ export const http2 = ({
   typeof onStream === 'function' && socket.on('stream', onStream)
   typeof onTimeout === 'function' && socket.on('timeout', onTimeout)
   socket.listen(options)
-
   if (async === true) {
     return new Promise((resolve, reject) => {
       socket.once('listening', () => {
@@ -112,7 +110,6 @@ export const https = ({
   typeof onRequest === 'function' && socket.on('request', onRequest)
   typeof onUpgrade === 'function' && socket.on('upgrade', onUpgrade)
   socket.listen(options)
-
   if (async === true) {
     return new Promise((resolve, reject) => {
       socket.once('listening', () => {
@@ -154,7 +151,6 @@ export const https2 = ({
   typeof onTimeout === 'function' && socket.on('timeout', onTimeout)
   typeof onUnknownProtocol === 'function' && socket.on('unknownProtocol', onUnknownProtocol)
   socket.listen(options)
-
   if (async === true) {
     return new Promise((resolve, reject) => {
       socket.once('listening', () => {
@@ -175,7 +171,6 @@ export const tcp = ({ async = true, onClose, onConnection, onError, onListening,
   typeof onError === 'function' && socket.on('error', onError)
   typeof onListening === 'function' && socket.on('listening', onListening)
   socket.listen(options)
-
   if (async === true) {
     return new Promise((resolve, reject) => {
       socket.once('listening', () => {
@@ -213,7 +208,6 @@ export const tls = ({
   typeof onResumeSession === 'function' && socket.on('resumeSession', onResumeSession)
   typeof onSecureConnection === 'function' && socket.on('secureConnection', onSecureConnection)
   socket.listen(options)
-
   if (async === true) {
     return new Promise((resolve, reject) => {
       socket.once('listening', () => {
@@ -243,7 +237,6 @@ export const udp = ({ async = true, onClose, onConnect, onError, onListening, on
   typeof onListening === 'function' && socket.on('listening', onListening)
   typeof onMesage === 'function' && socket.on('message', onMesage)
   socket.bind(options)
-
   if (async === true) {
     return new Promise((resolve, reject) => {
       socket.once('listening', () => {
