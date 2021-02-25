@@ -1,17 +1,11 @@
 {
   "name": "@awesomeorganization/servers",
   "description": "[ESM] The easiest way to create http, http2, https, https2, tcp, tls, udp servers in Node.js",
-  "version": "0.1.2",
-  "main": "main.js",
+  "version": "0.2.0",
+  "exports": "./main.js",
   "type": "module",
   "repository": "github:awesomeorganization/servers",
   "license": "MIT",
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "scripts": {
-    "test": "node test.js"
-  },
   "author": {
     "name": "sergeysedoy97"
   },
