@@ -1,7 +1,7 @@
 {
   "name": "@awesomeorganization/servers",
   "description": "[ESM] The easiest way to create http, http2, https, https2, tcp, tls, udp servers in Node.js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "exports": "./main.js",
   "type": "module",
   "repository": "github:awesomeorganization/servers",

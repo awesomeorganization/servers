@@ -15,7 +15,11 @@ export const http = async ({
   onUpgrade,
 }) => {
   const { createServer } = await import('http')
-  const socket = createServer(createOptions)
+  // FOR COMPATABILITY
+  if ('address' in listenOptions === true) {
+    listenOptions.host = listenOptions.address
+  }
+  const socket = createServer(createOptions).listen(listenOptions)
   typeof onCheckContinue === 'function' && socket.on('checkContinue', onCheckContinue)
   typeof onCheckExpectation === 'function' && socket.on('checkExpectation', onCheckExpectation)
   typeof onClientError === 'function' && socket.on('clientError', onClientError)
@@ -26,12 +30,11 @@ export const http = async ({
   typeof onListening === 'function' && socket.on('listening', onListening)
   typeof onRequest === 'function' && socket.on('request', onRequest)
   typeof onUpgrade === 'function' && socket.on('upgrade', onUpgrade)
-  socket.listen(listenOptions)
   return new Promise((resolve, reject) => {
-    socket.once('listening', () => {
+    socket.prependOnceListener('listening', () => {
       setImmediate(resolve, socket)
     })
-    socket.once('error', (error) => {
+    socket.prependOnceListener('error', (error) => {
       setImmediate(reject, error)
     })
   })
@@ -52,6 +55,10 @@ export const https = async ({
   onUpgrade,
 }) => {
   const { createServer } = await import('https')
+  // FOR COMPATABILITY
+  if ('address' in listenOptions === true) {
+    listenOptions.host = listenOptions.address
+  }
   const socket = createServer(createOptions).listen(listenOptions)
   typeof onCheckContinue === 'function' && socket.on('checkContinue', onCheckContinue)
   typeof onCheckExpectation === 'function' && socket.on('checkExpectation', onCheckExpectation)
@@ -64,10 +71,10 @@ export const https = async ({
   typeof onRequest === 'function' && socket.on('request', onRequest)
   typeof onUpgrade === 'function' && socket.on('upgrade', onUpgrade)
   return new Promise((resolve, reject) => {
-    socket.once('listening', () => {
+    socket.prependOnceListener('listening', () => {
       setImmediate(resolve, socket)
     })
-    socket.once('error', (error) => {
+    socket.prependOnceListener('error', (error) => {
       setImmediate(reject, error)
     })
   })
@@ -88,6 +95,10 @@ export const http2 = async ({
   onTimeout,
 }) => {
   const { createServer } = await import('http2')
+  // FOR COMPATABILITY
+  if ('address' in listenOptions === true) {
+    listenOptions.host = listenOptions.address
+  }
   const socket = createServer(createOptions).listen(listenOptions)
   typeof onCheckContinue === 'function' && socket.on('checkContinue', onCheckContinue)
   typeof onClose === 'function' && socket.on('close', onClose)
@@ -100,10 +111,10 @@ export const http2 = async ({
   typeof onStream === 'function' && socket.on('stream', onStream)
   typeof onTimeout === 'function' && socket.on('timeout', onTimeout)
   return new Promise((resolve, reject) => {
-    socket.once('listening', () => {
+    socket.prependOnceListener('listening', () => {
       setImmediate(resolve, socket)
     })
-    socket.once('error', (error) => {
+    socket.prependOnceListener('error', (error) => {
       setImmediate(reject, error)
     })
   })
@@ -125,6 +136,10 @@ export const https2 = async ({
   onUnknownProtocol,
 }) => {
   const { createSecureServer } = await import('http2')
+  // FOR COMPATABILITY
+  if ('address' in listenOptions === true) {
+    listenOptions.host = listenOptions.address
+  }
   const socket = createSecureServer(createOptions).listen(listenOptions)
   typeof onCheckContinue === 'function' && socket.on('checkContinue', onCheckContinue)
   typeof onClose === 'function' && socket.on('close', onClose)
@@ -138,10 +153,10 @@ export const https2 = async ({
   typeof onTimeout === 'function' && socket.on('timeout', onTimeout)
   typeof onUnknownProtocol === 'function' && socket.on('unknownProtocol', onUnknownProtocol)
   return new Promise((resolve, reject) => {
-    socket.once('listening', () => {
+    socket.prependOnceListener('listening', () => {
       setImmediate(resolve, socket)
     })
-    socket.once('error', (error) => {
+    socket.prependOnceListener('error', (error) => {
       setImmediate(reject, error)
     })
   })
@@ -149,16 +164,20 @@ export const https2 = async ({
 
 export const tcp = async ({ createOptions = {}, listenOptions = {}, onClose, onConnection, onError, onListening }) => {
   const { createServer } = await import('net')
+  // FOR COMPATABILITY
+  if ('address' in listenOptions === true) {
+    listenOptions.host = listenOptions.address
+  }
   const socket = createServer(createOptions).listen(listenOptions)
   typeof onClose === 'function' && socket.on('close', onClose)
   typeof onConnection === 'function' && socket.on('connection', onConnection)
   typeof onError === 'function' && socket.on('error', onError)
   typeof onListening === 'function' && socket.on('listening', onListening)
   return new Promise((resolve, reject) => {
-    socket.once('listening', () => {
+    socket.prependOnceListener('listening', () => {
       setImmediate(resolve, socket)
     })
-    socket.once('error', (error) => {
+    socket.prependOnceListener('error', (error) => {
       setImmediate(reject, error)
     })
   })
@@ -178,6 +197,10 @@ export const tls = async ({
   onSecureConnection,
 }) => {
   const { createServer } = await import('tls')
+  // FOR COMPATABILITY
+  if ('address' in listenOptions === true) {
+    listenOptions.host = listenOptions.address
+  }
   const socket = createServer(createOptions).listen(listenOptions)
   typeof onClose === 'function' && socket.on('close', onClose)
   typeof onConnection === 'function' && socket.on('connection', onConnection)
@@ -189,10 +212,10 @@ export const tls = async ({
   typeof onResumeSession === 'function' && socket.on('resumeSession', onResumeSession)
   typeof onSecureConnection === 'function' && socket.on('secureConnection', onSecureConnection)
   return new Promise((resolve, reject) => {
-    socket.once('listening', () => {
+    socket.prependOnceListener('listening', () => {
       setImmediate(resolve, socket)
     })
-    socket.once('error', (error) => {
+    socket.prependOnceListener('error', (error) => {
       setImmediate(reject, error)
     })
   })
@@ -212,10 +235,10 @@ export const udp = async ({ createOptions = {}, listenOptions = {}, onClose, onC
   typeof onListening === 'function' && socket.on('listening', onListening)
   typeof onMessage === 'function' && socket.on('message', onMessage)
   return new Promise((resolve, reject) => {
-    socket.once('listening', () => {
+    socket.prependOnceListener('listening', () => {
       setImmediate(resolve, socket)
     })
-    socket.once('error', (error) => {
+    socket.prependOnceListener('error', (error) => {
       setImmediate(reject, error)
     })
   })

@@ -19,43 +19,73 @@
 import { http, http2, https, https2, tcp, tls, udp } from '@awesomeorganization/servers'
 
 const http = await http({
-  host,
-  port,
-})
-
-const http2 = await http2({
-  host,
-  port,
+  listenOptions: {
+    host,
+    ipv6Only,
+    port,
+  },
 })
 
 const https = await https({
-  cert,
-  host,
-  key,
-  port,
+  createOptions: {
+    cert,
+    key,
+  },
+  listenOptions: {
+    host,
+    ipv6Only,
+    port,
+  },
+})
+
+const http2 = await http2({
+  listenOptions: {
+    host,
+    ipv6Only,
+    port,
+  },
 })
 
 const https2 = await https2({
-  cert,
-  host,
-  key,
-  port,
+  createOptions: {
+    cert,
+    key,
+  },
+  listenOptions: {
+    host,
+    ipv6Only,
+    port,
+  },
 })
 
 const tcp = await tcp({
-  host,
-  port,
+  listenOptions: {
+    host,
+    ipv6Only,
+    port,
+  },
 })
 
 const tls = await tls({
-  cert,
-  host,
-  key,
-  port,
+  createOptions: {
+    cert,
+    key,
+  },
+  listenOptions: {
+    host,
+    ipv6Only,
+    port,
+  },
 })
 
 const udp = await udp({
-  host,
-  port,
+  createOptions: {
+    ipv6Only,
+    type,
+  },
+  listenOptions: {
+    host,
+    port,
+  },
 })
 ```
