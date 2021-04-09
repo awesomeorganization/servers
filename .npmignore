@@ -1,3 +1,4 @@
+.deepsource.toml
 .dockerignore
 .editorconfig
 .eslintignore
@@ -6,5 +7,6 @@
 .prettierrc.json
 .vscode
 *.log
+example
 node_modules
 test
