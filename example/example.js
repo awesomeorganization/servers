@@ -1,52 +1,33 @@
 /* eslint-disable node/no-unsupported-features/es-syntax */
 
-import { REDIRECT_STATUS_CODES, rewriteHandler } from '@awesomeorganization/rewrite-handler'
+import { LOCALHOST_CERT, LOCALHOST_KEY, http, https } from '@awesomeorganization/servers'
 
-import { http } from '@awesomeorganization/servers'
-import { staticHandler } from '@awesomeorganization/static-handler'
-
-const example = async () => {
-  const rewriteMiddleware = rewriteHandler({
-    rules: [
-      {
-        pattern: '^/old-files/(.*)',
-        replacement: '/files/$1',
-        statusCode: REDIRECT_STATUS_CODES.MOVED_PERMANENTLY,
-      },
-      {
-        pattern: '(.*)/$',
-        replacement: '$1/index.txt',
-      },
-    ],
-  })
-  const staticMiddleware = await staticHandler({
-    directoryPath: './static',
-  })
+const example = () => {
   http({
     listenOptions: {
       host: '127.0.0.1',
       port: 3000,
     },
     onRequest(request, response) {
-      rewriteMiddleware.handle({
-        request,
-        response,
-      })
-      if (response.writableEnded === true) {
-        return
-      }
-      staticMiddleware.handle({
-        request,
-        response,
-      })
+      response.end('Hi!')
+    },
+  })
+  https({
+    createOptions: {
+      cert: LOCALHOST_CERT,
+      key: LOCALHOST_KEY,
+    },
+    listenOptions: {
+      host: '127.0.0.1',
+      port: 4000,
+    },
+    onRequest(request, response) {
+      response.end('Hi!')
     },
   })
   // TRY
   // http://127.0.0.1:3000/
-  // http://127.0.0.1:3000/files/
-  // http://127.0.0.1:3000/files/somefile.txt
-  // http://127.0.0.1:3000/old-files/
-  // http://127.0.0.1:3000/old-files/somefile.txt
+  // https://127.0.0.1:4000/
 }
 
 example()
