@@ -1,7 +1,7 @@
 {
   "name": "@awesomeorganization/servers",
   "description": "[ESM] The easiest way to create http, http2, https, https2, tcp, tls, udp servers in Node.js",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "exports": "./main.js",
   "type": "module",
   "repository": "github:awesomeorganization/servers",
@@ -12,18 +12,6 @@
   "devDependencies": {
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-node": "11.1.0"
-  },
-  "peerDependencies": {
-    "eslint": "7.32.0",
-    "prettier": "2.4.1"
-  },
-  "peerDependenciesMeta": {
-    "eslint": {
-      "optional": true
-    },
-    "prettier": {
-      "optional": true
-    }
   },
   "keywords": [
     "http",
