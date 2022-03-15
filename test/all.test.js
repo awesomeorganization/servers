@@ -1,114 +1,94 @@
-/* eslint-disable node/no-unsupported-features/es-syntax */
-
 import { LOCALHOST_CERT, LOCALHOST_KEY, http, http2, https, https2, tcp, tls, udp } from '../main.js'
 
-import { deepStrictEqual } from 'assert'
+import { strict as assert } from 'assert'
+import { once } from 'events'
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-const expectedMessage = Buffer.from('OK')
+const expected = Buffer.from('OK')
 
-const assertMessage = (actualMessage, family, protocol) => {
-  deepStrictEqual(actualMessage, expectedMessage)
-  console.log(family, protocol)
+const assertBuffer = (actual) => {
+  assert.deepEqual(actual, expected)
 }
 
-const assertData = (stream, family, protocol, next) => {
+const assertStream = async (stream) => {
   const chunks = []
-  stream.on('data', (chunk) => {
+  for await (const chunk of stream) {
     chunks.push(chunk)
-  })
-  stream.once('end', () => {
-    const actualMessage = Buffer.concat(chunks)
-    assertMessage(actualMessage, family, protocol)
-    next()
-  })
+  }
+  assertBuffer(Buffer.concat(chunks))
 }
 
 const clients = {
-  async http({ address, family, port }) {
+  async http({ address, port }) {
     const { request } = await import('http')
-    request({
-      agent: false,
-      host: address,
-      port,
-    })
-      .once('response', (incomingMessage) => {
-        assertData(incomingMessage, family, 'http', () => {})
-      })
-      .end()
+    const [stream] = await once(
+      request({
+        agent: false,
+        host: address,
+        port,
+      }).end(),
+      'response'
+    )
+    await assertStream(stream)
   },
-  async https({ address, family, port }) {
+  async https({ address, port }) {
     const { request } = await import('https')
-    request({
-      agent: false,
-      host: address,
-      port,
-    })
-      .once('response', (incomingMessage) => {
-        assertData(incomingMessage, family, 'https', () => {})
-      })
-      .end()
+    const [stream] = await once(
+      request({
+        agent: false,
+        host: address,
+        port,
+      }).end(),
+      'response'
+    )
+    await assertStream(stream)
   },
-  async http2({ address, family, port }) {
+  async http2({ address, port }) {
     const { connect } = await import('http2')
-    const session = connect({
+    const socket = connect({
       host: address,
       port,
       protocol: 'http:',
     })
-    session.once('connect', () => {
-      const stream = session.request({
-        endStream: true,
-      })
-      stream
-        .once('response', () => {
-          assertData(stream, family, 'http2', () => {})
-        })
-        .once('close', () => {
-          session.close() // disallowHalfOpen
-        })
+    await once(socket, 'connect')
+    const stream = socket.request({
+      endStream: true,
     })
+    await assertStream(stream)
+    socket.close()
   },
-  async https2({ address, family, port }) {
+  async https2({ address, port }) {
     const { connect } = await import('http2')
-    const session = connect({
+    const socket = connect({
       host: address,
       port,
       protocol: 'https:',
     })
-    session.once('connect', () => {
-      const stream = session.request({
-        endStream: true,
-      })
-      stream
-        .once('response', () => {
-          assertData(stream, family, 'https2', () => {})
-        })
-        .once('close', () => {
-          session.close() // disallowHalfOpen
-        })
+    await once(socket, 'connect')
+    const stream = socket.request({
+      endStream: true,
     })
+    await assertStream(stream)
+    socket.close()
   },
-  async tcp({ address, family, port }) {
-    const { createConnection } = await import('net')
-    const socket = createConnection({
+  async tcp({ address, port }) {
+    const { connect } = await import('net')
+    const socket = connect({
       host: address,
       port,
     })
-    socket.once('connect', () => {
-      assertData(socket, family, 'tcp', () => {})
-    })
+    await once(socket, 'connect')
+    await assertStream(socket)
   },
-  async tls({ address, family, port }) {
+  async tls({ address, port }) {
     const { connect } = await import('tls')
     const socket = connect({
       host: address,
       port,
     })
-    socket.once('secureConnect', () => {
-      assertData(socket, family, 'tls', () => {})
-    })
+    await once(socket, 'secureConnect')
+    await assertStream(socket)
   },
   async udp({ address, family, port }) {
     const { createSocket } = await import('dgram')
@@ -124,14 +104,11 @@ const clients = {
           }
     )
     socket.connect(port, address)
-    socket.once('connect', () => {
-      socket.send(expectedMessage, () => {
-        socket.once('message', (message) => {
-          assertMessage(message, family, 'udp')
-          socket.close()
-        })
-      })
-    })
+    await once(socket, 'connect')
+    socket.send(expected)
+    const [message] = await once(socket, 'message')
+    assertBuffer(message)
+    socket.close()
   },
 }
 
@@ -141,18 +118,19 @@ const test = () => {
     { host: '::1', ipv6Only: true },
   ]) {
     http({
+      handlers: {
+        async listening() {
+          await clients.http(this.address())
+          this.close()
+        },
+        request(request, response) {
+          response.end(expected)
+        },
+      },
       listenOptions: {
         host,
         ipv6Only,
         port: 0,
-      },
-      onListening() {
-        clients.http(this.address())
-      },
-      onRequest(incomingMessage, serverResponse) {
-        serverResponse.end(expectedMessage, () => {
-          this.close()
-        })
       },
     })
     https({
@@ -160,33 +138,35 @@ const test = () => {
         cert: LOCALHOST_CERT,
         key: LOCALHOST_KEY,
       },
+      handlers: {
+        async listening() {
+          await clients.https(this.address())
+          this.close()
+        },
+        request(request, response) {
+          response.end(expected)
+        },
+      },
       listenOptions: {
         host,
         ipv6Only,
         port: 0,
-      },
-      onListening() {
-        clients.https(this.address())
-      },
-      onRequest(incomingMessage, serverResponse) {
-        serverResponse.end(expectedMessage, () => {
-          this.close()
-        })
       },
     })
     http2({
+      handlers: {
+        async listening() {
+          await clients.http2(this.address())
+          this.close()
+        },
+        stream(stream) {
+          stream.end(expected)
+        },
+      },
       listenOptions: {
         host,
         ipv6Only,
         port: 0,
-      },
-      onListening() {
-        clients.http2(this.address())
-      },
-      onStream(stream) {
-        stream.end(expectedMessage, () => {
-          this.close()
-        })
       },
     })
     https2({
@@ -194,33 +174,35 @@ const test = () => {
         cert: LOCALHOST_CERT,
         key: LOCALHOST_KEY,
       },
+      handlers: {
+        async listening() {
+          await clients.https2(this.address())
+          this.close()
+        },
+        stream(stream) {
+          stream.end(expected)
+        },
+      },
       listenOptions: {
         host,
         ipv6Only,
         port: 0,
-      },
-      onListening() {
-        clients.https2(this.address())
-      },
-      onStream(stream) {
-        stream.end(expectedMessage, () => {
-          this.close()
-        })
       },
     })
     tcp({
+      handlers: {
+        connection(connection) {
+          connection.end(expected)
+        },
+        async listening() {
+          await clients.tcp(this.address())
+          this.close()
+        },
+      },
       listenOptions: {
         host,
         ipv6Only,
         port: 0,
-      },
-      onConnection(connection) {
-        connection.end(expectedMessage, () => {
-          this.close()
-        })
-      },
-      onListening() {
-        clients.tcp(this.address())
       },
     })
     tls({
@@ -228,18 +210,19 @@ const test = () => {
         cert: LOCALHOST_CERT,
         key: LOCALHOST_KEY,
       },
+      handlers: {
+        async listening() {
+          await clients.tls(this.address())
+          this.close()
+        },
+        secureConnection(secureConnection) {
+          secureConnection.end(expected)
+        },
+      },
       listenOptions: {
         host,
         ipv6Only,
         port: 0,
-      },
-      onListening() {
-        clients.tls(this.address())
-      },
-      onSecureConnection(connection) {
-        connection.end(expectedMessage, () => {
-          this.close()
-        })
       },
     })
     udp({
@@ -247,17 +230,18 @@ const test = () => {
         ipv6Only,
         type: ipv6Only === true ? 'udp6' : 'udp4',
       },
+      handlers: {
+        async listening() {
+          await clients.udp(this.address())
+          this.close()
+        },
+        message(message, { address, port, size }) {
+          this.send(message, 0, size, port, address)
+        },
+      },
       listenOptions: {
         host,
         port: 0,
-      },
-      onListening() {
-        clients.udp(this.address())
-      },
-      onMessage(message, address) {
-        this.send(message, address.port, address.address, () => {
-          this.close()
-        })
       },
     })
   }

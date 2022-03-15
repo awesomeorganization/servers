@@ -4,21 +4,27 @@
 
 ---
 
-![npm](https://img.shields.io/david/awesomeorganization/servers)
-![npm](https://img.shields.io/npm/v/@awesomeorganization/servers)
-![npm](https://img.shields.io/npm/dt/@awesomeorganization/servers)
-![npm](https://img.shields.io/npm/l/@awesomeorganization/servers)
-![npm](https://img.shields.io/bundlephobia/minzip/@awesomeorganization/servers)
-![npm](https://img.shields.io/bundlephobia/min/@awesomeorganization/servers)
+![GitHub Workflow](https://img.shields.io/github/workflow/status/awesomeorganization/servers/npm-publish?style=flat-square)
+![Codacy](https://img.shields.io/codacy/grade/6f224801be0543b99e8ee12db87f9316?style=flat-square)
+![CodeFactor](https://img.shields.io/codefactor/grade/github/awesomeorganization/servers?style=flat-square)
+![Snyk](https://img.shields.io/snyk/vulnerabilities/npm/@awesomeorganization/servers?style=flat-square)
+![Depfu](https://img.shields.io/depfu/awesomeorganization/servers?style=flat-square)
+![npms.io](https://img.shields.io/npms-io/final-score/@awesomeorganization/servers?style=flat-square)
 
 ---
 
+## Install
+
+```sh
+npm install @awesomeorganization/servers
+```
+
 ## Example
 
-```
+```js
 import { http, http2, https, https2, tcp, tls, udp } from '@awesomeorganization/servers'
 
-const http = await http({
+http({
   listenOptions: {
     host,
     ipv6Only,
@@ -26,7 +32,7 @@ const http = await http({
   },
 })
 
-const https = await https({
+https({
   createOptions: {
     cert,
     key,
@@ -38,7 +44,7 @@ const https = await https({
   },
 })
 
-const http2 = await http2({
+http2({
   listenOptions: {
     host,
     ipv6Only,
@@ -46,7 +52,7 @@ const http2 = await http2({
   },
 })
 
-const https2 = await https2({
+https2({
   createOptions: {
     cert,
     key,
@@ -58,7 +64,7 @@ const https2 = await https2({
   },
 })
 
-const tcp = await tcp({
+tcp({
   listenOptions: {
     host,
     ipv6Only,
@@ -66,7 +72,7 @@ const tcp = await tcp({
   },
 })
 
-const tls = await tls({
+tls({
   createOptions: {
     cert,
     key,
@@ -78,7 +84,7 @@ const tls = await tls({
   },
 })
 
-const udp = await udp({
+udp({
   createOptions: {
     ipv6Only,
     type,

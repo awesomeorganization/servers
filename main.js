@@ -1,5 +1,7 @@
 /* eslint-disable node/no-unsupported-features/es-syntax */
 
+import { on, once } from 'events'
+
 export const LOCALHOST_CERT = `-----BEGIN CERTIFICATE-----
 MIIDlTCCAn2gAwIBAgIJAIiA2UzhbmG1MA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNV
 BAYTAlJVMQ8wDQYDVQQIEwZNb3Njb3cxDzANBgNVBAcTBk1vc2NvdzEeMBwGA1UE
@@ -51,246 +53,78 @@ Vdn937sOFHGPVbRUJ8Y9KOhhl7iaO4WH9EdxSPTEMWHEbsZoaKgvgtAT/sYAIKfp
 UJeqNxeR9YN60iLw6jJpM2mq11sa4pnGh53ISP1uWkqVLMgXIvJPFzuQ
 -----END RSA PRIVATE KEY-----`
 
-export const http = async ({
-  createOptions = {},
-  listenOptions = {},
-  onCheckContinue,
-  onCheckExpectation,
-  onClientError,
-  onClose,
-  onConnect,
-  onConnection,
-  onError,
-  onListening,
-  onRequest,
-  onUpgrade,
-}) => {
-  const { createServer } = await import('http')
-  // FOR COMPATABILITY
-  if ('address' in listenOptions === true) {
-    listenOptions.host = listenOptions.address
+const initHandlers = (socket, handlers) => {
+  for (const [event, handler] of Object.entries(handlers)) {
+    const clojure = async () => {
+      for await (const args of on(socket, event)) {
+        handler.apply(socket, args)
+      }
+    }
+    clojure()
   }
-  const socket = createServer(createOptions).listen(listenOptions)
-  typeof onCheckContinue === 'function' && socket.on('checkContinue', onCheckContinue)
-  typeof onCheckExpectation === 'function' && socket.on('checkExpectation', onCheckExpectation)
-  typeof onClientError === 'function' && socket.on('clientError', onClientError)
-  typeof onClose === 'function' && socket.on('close', onClose)
-  typeof onConnect === 'function' && socket.on('connect', onConnect)
-  typeof onConnection === 'function' && socket.on('connection', onConnection)
-  typeof onError === 'function' && socket.on('error', onError)
-  typeof onListening === 'function' && socket.on('listening', onListening)
-  typeof onRequest === 'function' && socket.on('request', onRequest)
-  typeof onUpgrade === 'function' && socket.on('upgrade', onUpgrade)
-  return new Promise((resolve, reject) => {
-    socket.prependOnceListener('listening', () => {
-      setImmediate(resolve, socket)
-    })
-    socket.prependOnceListener('error', (error) => {
-      setImmediate(reject, error)
-    })
-  })
 }
 
-export const https = async ({
-  createOptions = {},
-  listenOptions = {},
-  onCheckContinue,
-  onCheckExpectation,
-  onClientError,
-  onClose,
-  onConnect,
-  onConnection,
-  onError,
-  onListening,
-  onRequest,
-  onUpgrade,
-}) => {
-  const { createServer } = await import('https')
-  // FOR COMPATABILITY
-  if ('address' in listenOptions === true) {
+const compatAddress = (listenOptions) => {
+  if ('host' in listenOptions === false && 'address' in listenOptions === true) {
     listenOptions.host = listenOptions.address
+    delete listenOptions.address
   }
-  const socket = createServer(createOptions).listen(listenOptions)
-  typeof onCheckContinue === 'function' && socket.on('checkContinue', onCheckContinue)
-  typeof onCheckExpectation === 'function' && socket.on('checkExpectation', onCheckExpectation)
-  typeof onClientError === 'function' && socket.on('clientError', onClientError)
-  typeof onClose === 'function' && socket.on('close', onClose)
-  typeof onConnect === 'function' && socket.on('connect', onConnect)
-  typeof onConnection === 'function' && socket.on('connection', onConnection)
-  typeof onError === 'function' && socket.on('error', onError)
-  typeof onListening === 'function' && socket.on('listening', onListening)
-  typeof onRequest === 'function' && socket.on('request', onRequest)
-  typeof onUpgrade === 'function' && socket.on('upgrade', onUpgrade)
-  return new Promise((resolve, reject) => {
-    socket.prependOnceListener('listening', () => {
-      setImmediate(resolve, socket)
-    })
-    socket.prependOnceListener('error', (error) => {
-      setImmediate(reject, error)
-    })
-  })
+  return listenOptions
 }
 
-export const http2 = async ({
-  createOptions = {},
-  listenOptions = {},
-  onCheckContinue,
-  onClose,
-  onConnection,
-  onError,
-  onListening,
-  onRequest,
-  onSession,
-  onSessionError,
-  onStream,
-  onTimeout,
-}) => {
-  const { createServer } = await import('http2')
-  // FOR COMPATABILITY
-  if ('address' in listenOptions === true) {
-    listenOptions.host = listenOptions.address
-  }
-  const socket = createServer(createOptions).listen(listenOptions)
-  typeof onCheckContinue === 'function' && socket.on('checkContinue', onCheckContinue)
-  typeof onClose === 'function' && socket.on('close', onClose)
-  typeof onConnection === 'function' && socket.on('connection', onConnection)
-  typeof onError === 'function' && socket.on('error', onError)
-  typeof onListening === 'function' && socket.on('listening', onListening)
-  typeof onRequest === 'function' && socket.on('request', onRequest)
-  typeof onSession === 'function' && socket.on('session', onSession)
-  typeof onSessionError === 'function' && socket.on('sessionError', onSessionError)
-  typeof onStream === 'function' && socket.on('stream', onStream)
-  typeof onTimeout === 'function' && socket.on('timeout', onTimeout)
-  return new Promise((resolve, reject) => {
-    socket.prependOnceListener('listening', () => {
-      setImmediate(resolve, socket)
-    })
-    socket.prependOnceListener('error', (error) => {
-      setImmediate(reject, error)
-    })
-  })
-}
-
-export const https2 = async ({
-  createOptions = {},
-  listenOptions = {},
-  onCheckContinue,
-  onClose,
-  onConnection,
-  onError,
-  onListening,
-  onRequest,
-  onSession,
-  onSessionError,
-  onStream,
-  onTimeout,
-  onUnknownProtocol,
-}) => {
-  const { createSecureServer } = await import('http2')
-  // FOR COMPATABILITY
-  if ('address' in listenOptions === true) {
-    listenOptions.host = listenOptions.address
-  }
-  const socket = createSecureServer(createOptions).listen(listenOptions)
-  typeof onCheckContinue === 'function' && socket.on('checkContinue', onCheckContinue)
-  typeof onClose === 'function' && socket.on('close', onClose)
-  typeof onConnection === 'function' && socket.on('connection', onConnection)
-  typeof onError === 'function' && socket.on('error', onError)
-  typeof onListening === 'function' && socket.on('listening', onListening)
-  typeof onRequest === 'function' && socket.on('request', onRequest)
-  typeof onSession === 'function' && socket.on('session', onSession)
-  typeof onSessionError === 'function' && socket.on('sessionError', onSessionError)
-  typeof onStream === 'function' && socket.on('stream', onStream)
-  typeof onTimeout === 'function' && socket.on('timeout', onTimeout)
-  typeof onUnknownProtocol === 'function' && socket.on('unknownProtocol', onUnknownProtocol)
-  return new Promise((resolve, reject) => {
-    socket.prependOnceListener('listening', () => {
-      setImmediate(resolve, socket)
-    })
-    socket.prependOnceListener('error', (error) => {
-      setImmediate(reject, error)
-    })
-  })
-}
-
-export const tcp = async ({ createOptions = {}, listenOptions = {}, onClose, onConnection, onError, onListening }) => {
-  const { createServer } = await import('net')
-  // FOR COMPATABILITY
-  if ('address' in listenOptions === true) {
-    listenOptions.host = listenOptions.address
-  }
-  const socket = createServer(createOptions).listen(listenOptions)
-  typeof onClose === 'function' && socket.on('close', onClose)
-  typeof onConnection === 'function' && socket.on('connection', onConnection)
-  typeof onError === 'function' && socket.on('error', onError)
-  typeof onListening === 'function' && socket.on('listening', onListening)
-  return new Promise((resolve, reject) => {
-    socket.prependOnceListener('listening', () => {
-      setImmediate(resolve, socket)
-    })
-    socket.prependOnceListener('error', (error) => {
-      setImmediate(reject, error)
-    })
-  })
-}
-
-export const tls = async ({
-  createOptions = {},
-  listenOptions = {},
-  onClose,
-  onConnection,
-  onError,
-  onKeylog,
-  onListening,
-  onNewSession,
-  onOcspRequest,
-  onResumeSession,
-  onSecureConnection,
-}) => {
-  const { createServer } = await import('tls')
-  // FOR COMPATABILITY
-  if ('address' in listenOptions === true) {
-    listenOptions.host = listenOptions.address
-  }
-  const socket = createServer(createOptions).listen(listenOptions)
-  typeof onClose === 'function' && socket.on('close', onClose)
-  typeof onConnection === 'function' && socket.on('connection', onConnection)
-  typeof onError === 'function' && socket.on('error', onError)
-  typeof onKeylog === 'function' && socket.on('keylog', onKeylog)
-  typeof onListening === 'function' && socket.on('listening', onListening)
-  typeof onNewSession === 'function' && socket.on('newSession', onNewSession)
-  typeof onOcspRequest === 'function' && socket.on('OCSPRequest', onOcspRequest)
-  typeof onResumeSession === 'function' && socket.on('resumeSession', onResumeSession)
-  typeof onSecureConnection === 'function' && socket.on('secureConnection', onSecureConnection)
-  return new Promise((resolve, reject) => {
-    socket.prependOnceListener('listening', () => {
-      setImmediate(resolve, socket)
-    })
-    socket.prependOnceListener('error', (error) => {
-      setImmediate(reject, error)
-    })
-  })
-}
-
-export const udp = async ({ createOptions = {}, listenOptions = {}, onClose, onConnect, onError, onListening, onMessage }) => {
-  const { createSocket } = await import('dgram')
-  // FOR COMPATABILITY
-  if ('host' in listenOptions === true) {
+const compatHost = (listenOptions) => {
+  if ('address' in listenOptions === false && 'host' in listenOptions === true) {
     listenOptions.address = listenOptions.host
+    delete listenOptions.host
   }
-  const socket = createSocket(createOptions)
-  socket.bind(listenOptions)
-  typeof onClose === 'function' && socket.on('close', onClose)
-  typeof onConnect === 'function' && socket.on('connect', onConnect)
-  typeof onError === 'function' && socket.on('error', onError)
-  typeof onListening === 'function' && socket.on('listening', onListening)
-  typeof onMessage === 'function' && socket.on('message', onMessage)
-  return new Promise((resolve, reject) => {
-    socket.prependOnceListener('listening', () => {
-      setImmediate(resolve, socket)
-    })
-    socket.prependOnceListener('error', (error) => {
-      setImmediate(reject, error)
-    })
-  })
+  return listenOptions
+}
+
+export const http = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
+  const { createServer } = await import('http')
+  const socket = createServer(createOptions).listen(compatAddress(listenOptions))
+  initHandlers(socket, handlers)
+  return once(socket, 'listening')
+}
+
+export const https = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
+  const { createServer } = await import('https')
+  const socket = createServer(createOptions).listen(compatAddress(listenOptions))
+  initHandlers(socket, handlers)
+  return once(socket, 'listening')
+}
+
+export const http2 = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
+  const { createServer } = await import('http2')
+  const socket = createServer(createOptions).listen(compatAddress(listenOptions))
+  initHandlers(socket, handlers)
+  return once(socket, 'listening')
+}
+
+export const https2 = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
+  const { createSecureServer: createServer } = await import('http2')
+  const socket = createServer(createOptions).listen(compatAddress(listenOptions))
+  initHandlers(socket, handlers)
+  return once(socket, 'listening')
+}
+
+export const tcp = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
+  const { createServer } = await import('net')
+  const socket = createServer(createOptions).listen(compatAddress(listenOptions))
+  initHandlers(socket, handlers)
+  return once(socket, 'listening')
+}
+
+export const tls = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
+  const { createServer } = await import('tls')
+  const socket = createServer(createOptions).listen(compatAddress(listenOptions))
+  initHandlers(socket, handlers)
+  return once(socket, 'listening')
+}
+
+export const udp = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
+  const { createSocket } = await import('dgram')
+  const socket = createSocket(createOptions).bind(compatHost(listenOptions))
+  initHandlers(socket, handlers)
+  return once(socket, 'listening')
 }
