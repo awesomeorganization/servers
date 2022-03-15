@@ -21,77 +21,52 @@ npm install @awesomeorganization/servers
 
 ## Example
 
-```js
-import { http, http2, https, https2, tcp, tls, udp } from '@awesomeorganization/servers'
+Full example in `/example` folder.
 
+```js
 http({
+  handlers: {
+    request(request, response) {
+      response.end('Hi!')
+    },
+  },
   listenOptions: {
-    host,
-    ipv6Only,
-    port,
+    host: '127.0.0.1',
+    port: 3000,
   },
 })
-
 https({
   createOptions: {
-    cert,
-    key,
+    cert: LOCALHOST_CERT,
+    key: LOCALHOST_KEY,
+  },
+  handlers: {
+    request(request, response) {
+      response.end('Hi!')
+    },
   },
   listenOptions: {
-    host,
-    ipv6Only,
-    port,
+    host: '127.0.0.1',
+    port: 4000,
   },
 })
-
-http2({
-  listenOptions: {
-    host,
-    ipv6Only,
-    port,
-  },
-})
-
 https2({
   createOptions: {
-    cert,
-    key,
+    cert: LOCALHOST_CERT,
+    key: LOCALHOST_KEY,
+  },
+  handlers: {
+    stream(stream) {
+      stream.end('Hi!')
+    },
   },
   listenOptions: {
-    host,
-    ipv6Only,
-    port,
+    host: '127.0.0.1',
+    port: 5000,
   },
 })
-
-tcp({
-  listenOptions: {
-    host,
-    ipv6Only,
-    port,
-  },
-})
-
-tls({
-  createOptions: {
-    cert,
-    key,
-  },
-  listenOptions: {
-    host,
-    ipv6Only,
-    port,
-  },
-})
-
-udp({
-  createOptions: {
-    ipv6Only,
-    type,
-  },
-  listenOptions: {
-    host,
-    port,
-  },
-})
+// TRY
+// http://127.0.0.1:3000/
+// https://127.0.0.1:4000/
+// https://127.0.0.1:5000/
 ```
