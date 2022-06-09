@@ -1,6 +1,5 @@
 /* eslint-disable node/no-unsupported-features/es-syntax */
-
-import { on, once } from 'events'
+import { on, once } from 'node:events'
 
 export const LOCALHOST_CERT = `-----BEGIN CERTIFICATE-----
 MIIDlTCCAn2gAwIBAgIJAIiA2UzhbmG1MA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNV
@@ -55,12 +54,12 @@ UJeqNxeR9YN60iLw6jJpM2mq11sa4pnGh53ISP1uWkqVLMgXIvJPFzuQ
 
 const initHandlers = (socket, handlers) => {
   for (const [event, handler] of Object.entries(handlers)) {
-    const clojure = async () => {
+    const closure = async () => {
       for await (const args of on(socket, event)) {
         handler.apply(socket, args)
       }
     }
-    clojure()
+    closure()
   }
 }
 
@@ -80,51 +79,72 @@ const compatHost = (listenOptions) => {
   return listenOptions
 }
 
-export const http = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
-  const { createServer } = await import('http')
+export const http = async ({ createOptions = {}, handlers = {}, listenOptions = {}, wait = true }) => {
+  const { createServer } = await import('node:http')
   const socket = createServer(createOptions).listen(compatAddress(listenOptions))
   initHandlers(socket, handlers)
-  return once(socket, 'listening')
+  if (wait === true) {
+    await once(socket, 'listening')
+  }
+  return socket
 }
 
-export const https = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
-  const { createServer } = await import('https')
+export const https = async ({ createOptions = {}, handlers = {}, listenOptions = {}, wait = true }) => {
+  const { createServer } = await import('node:https')
   const socket = createServer(createOptions).listen(compatAddress(listenOptions))
   initHandlers(socket, handlers)
-  return once(socket, 'listening')
+  if (wait === true) {
+    await once(socket, 'listening')
+  }
+  return socket
 }
 
-export const http2 = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
-  const { createServer } = await import('http2')
+export const http2 = async ({ createOptions = {}, handlers = {}, listenOptions = {}, wait = true }) => {
+  const { createServer } = await import('node:http2')
   const socket = createServer(createOptions).listen(compatAddress(listenOptions))
   initHandlers(socket, handlers)
-  return once(socket, 'listening')
+  if (wait === true) {
+    await once(socket, 'listening')
+  }
+  return socket
 }
 
-export const https2 = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
-  const { createSecureServer: createServer } = await import('http2')
+export const https2 = async ({ createOptions = {}, handlers = {}, listenOptions = {}, wait = true }) => {
+  const { createSecureServer: createServer } = await import('node:http2')
   const socket = createServer(createOptions).listen(compatAddress(listenOptions))
   initHandlers(socket, handlers)
-  return once(socket, 'listening')
+  if (wait === true) {
+    await once(socket, 'listening')
+  }
+  return socket
 }
 
-export const tcp = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
-  const { createServer } = await import('net')
+export const tcp = async ({ createOptions = {}, handlers = {}, listenOptions = {}, wait = true }) => {
+  const { createServer } = await import('node:net')
   const socket = createServer(createOptions).listen(compatAddress(listenOptions))
   initHandlers(socket, handlers)
-  return once(socket, 'listening')
+  if (wait === true) {
+    await once(socket, 'listening')
+  }
+  return socket
 }
 
-export const tls = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
-  const { createServer } = await import('tls')
+export const tls = async ({ createOptions = {}, handlers = {}, listenOptions = {}, wait = true }) => {
+  const { createServer } = await import('node:tls')
   const socket = createServer(createOptions).listen(compatAddress(listenOptions))
   initHandlers(socket, handlers)
-  return once(socket, 'listening')
+  if (wait === true) {
+    await once(socket, 'listening')
+  }
+  return socket
 }
 
-export const udp = async ({ createOptions = {}, handlers = {}, listenOptions = {} }) => {
-  const { createSocket } = await import('dgram')
+export const udp = async ({ createOptions = {}, handlers = {}, listenOptions = {}, wait = true }) => {
+  const { createSocket } = await import('node:dgram')
   const socket = createSocket(createOptions).bind(compatHost(listenOptions))
   initHandlers(socket, handlers)
-  return once(socket, 'listening')
+  if (wait === true) {
+    await once(socket, 'listening')
+  }
+  return socket
 }
