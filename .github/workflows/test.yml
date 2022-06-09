@@ -13,5 +13,5 @@ jobs:
       matrix:
         node-version:
           - 16
-name: npm-test
+name: test
 'on': push
