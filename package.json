@@ -1,27 +1,34 @@
 {
-  "name": "@awesomeorganization/servers",
-  "description": "[ESM] The easiest way to create http, http2, https, https2, tcp, tls, udp servers in Node.js",
-  "version": "2.0.1",
-  "exports": "./main.js",
-  "type": "module",
-  "repository": "github:awesomeorganization/servers",
-  "license": "MIT",
   "author": {
-    "name": "sergeysedoy97"
+    "name": "sergeysedoy97",
+    "url": "https://github.com/sergeysedoy97"
   },
-  "scripts": {
-    "test": "node test/all.test.js"
+  "bugs": {
+    "url": "https://github.com/awesomeorganization/servers/issues"
+  },
+  "description": "[ESM] The easiest way to create http, http2, https, https2, tcp, tls, udp servers in Node.js",
+  "devDependencies": {
+    "@commitlint/cli": "17.0.2",
+    "@commitlint/config-conventional": "17.0.2",
+    "eslint": "8.17.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-prettier": "4.0.0",
+    "eslint-plugin-promise": "6.0.0",
+    "eslint-plugin-regexp": "1.7.0",
+    "eslint-plugin-sonarjs": "0.13.0",
+    "husky": "8.0.1",
+    "prettier": "2.6.2"
   },
   "engines": {
-    "node": ">=11.13.0"
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   },
-  "devDependencies": {
-    "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-github": "4.3.5",
-    "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-sonarjs": "0.12.0",
-    "husky": "^7.0.4"
-  },
+  "files": [
+    "main.js"
+  ],
+  "homepage": "https://github.com/awesomeorganization/servers",
   "keywords": [
     "http",
     "http2",
@@ -32,5 +39,16 @@
     "tcp",
     "tls",
     "udp"
-  ]
+  ],
+  "license": "MIT",
+  "main": "main.js",
+  "name": "@awesomeorganization/servers",
+  "repository": "github:awesomeorganization/servers",
+  "scripts": {
+    "prepare": "husky install",
+    "test": "node test/all.test.js"
+  },
+  "type": "module",
+  "types": "main.d.ts",
+  "version": "0.0.0"
 }
