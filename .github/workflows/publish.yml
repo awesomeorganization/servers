@@ -1,0 +1,37 @@
+---
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - id: release
+        uses: google-github-actions/release-please-action@v3
+        with:
+          package-name: '@awesomeorganization/servers'
+          release-type: node
+      - if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v3
+      - if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-node@v3
+        with:
+          always-auth: true
+          node-version: 16
+          registry-url: https://npm.pkg.github.com
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - if: ${{ steps.release.outputs.release_created }}
+        run: npm publish
+      - if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-node@v3
+        with:
+          always-auth: true
+          node-version: 16
+          registry-url: https://registry.npmjs.org
+          token: ${{ secrets.NPM_TOKEN }}
+      - if: ${{ steps.release.outputs.release_created }}
+        run: npm publish
+name: publish
+'on':
+  push:
+    branches:
+      - main
+      - master
+permissions: write-all
