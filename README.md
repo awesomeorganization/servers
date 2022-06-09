@@ -1,4 +1,4 @@
-# servers
+# @awesomeorganization/servers
 
 :boom: [ESM] The easiest way to create http, http2, https, https2, tcp, tls, udp servers in Node.js
 
@@ -24,47 +24,54 @@ npm install @awesomeorganization/servers
 Full example in `/example` folder.
 
 ```js
-http({
-  handlers: {
-    request(request, response) {
-      response.end('Hi!')
+import { LOCALHOST_CERT, LOCALHOST_KEY, http, https, https2 } from '@awesomeorganization/servers'
+
+const example = () => {
+  http({
+    handlers: {
+      request(_request, response) {
+        response.end('Hi!')
+      },
     },
-  },
-  listenOptions: {
-    host: '127.0.0.1',
-    port: 3000,
-  },
-})
-https({
-  createOptions: {
-    cert: LOCALHOST_CERT,
-    key: LOCALHOST_KEY,
-  },
-  handlers: {
-    request(request, response) {
-      response.end('Hi!')
+    listenOptions: {
+      host: '127.0.0.1',
+      port: 3000,
     },
-  },
-  listenOptions: {
-    host: '127.0.0.1',
-    port: 4000,
-  },
-})
-https2({
-  createOptions: {
-    cert: LOCALHOST_CERT,
-    key: LOCALHOST_KEY,
-  },
-  handlers: {
-    stream(stream) {
-      stream.end('Hi!')
+  })
+  https({
+    createOptions: {
+      cert: LOCALHOST_CERT,
+      key: LOCALHOST_KEY,
     },
-  },
-  listenOptions: {
-    host: '127.0.0.1',
-    port: 5000,
-  },
-})
+    handlers: {
+      request(_request, response) {
+        response.end('Hi!')
+      },
+    },
+    listenOptions: {
+      host: '127.0.0.1',
+      port: 4000,
+    },
+  })
+  https2({
+    createOptions: {
+      cert: LOCALHOST_CERT,
+      key: LOCALHOST_KEY,
+    },
+    handlers: {
+      stream(stream) {
+        stream.end('Hi!')
+      },
+    },
+    listenOptions: {
+      host: '127.0.0.1',
+      port: 5000,
+    },
+  })
+}
+
+example()
+
 // TRY
 // http://127.0.0.1:3000/
 // https://127.0.0.1:4000/
