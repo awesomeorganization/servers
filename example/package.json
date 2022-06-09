@@ -1,9 +1,9 @@
 {
-  "private": true,
-  "name": "example",
-  "version": "0.0.0",
-  "type": "module",
   "dependencies": {
     "@awesomeorganization/servers": ".."
-  }
+  },
+  "name": "example",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0"
 }
