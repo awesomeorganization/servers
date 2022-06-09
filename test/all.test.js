@@ -1,14 +1,15 @@
+/* eslint-disable node/no-unsupported-features/es-syntax */
 import { LOCALHOST_CERT, LOCALHOST_KEY, http, http2, https, https2, tcp, tls, udp } from '../main.js'
 
-import { strict as assert } from 'assert'
-import { once } from 'events'
+import { deepEqual } from 'node:assert'
+import { once } from 'node:events'
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const expected = Buffer.from('OK')
 
 const assertBuffer = (actual) => {
-  assert.deepEqual(actual, expected)
+  deepEqual(actual, expected)
 }
 
 const assertStream = async (stream) => {
@@ -21,19 +22,7 @@ const assertStream = async (stream) => {
 
 const clients = {
   async http({ address, port }) {
-    const { request } = await import('http')
-    const [stream] = await once(
-      request({
-        agent: false,
-        host: address,
-        port,
-      }).end(),
-      'response'
-    )
-    await assertStream(stream)
-  },
-  async https({ address, port }) {
-    const { request } = await import('https')
+    const { request } = await import('node:http')
     const [stream] = await once(
       request({
         agent: false,
@@ -45,7 +34,7 @@ const clients = {
     await assertStream(stream)
   },
   async http2({ address, port }) {
-    const { connect } = await import('http2')
+    const { connect } = await import('node:http2')
     const socket = connect({
       host: address,
       port,
@@ -58,8 +47,20 @@ const clients = {
     await assertStream(stream)
     socket.close()
   },
+  async https({ address, port }) {
+    const { request } = await import('node:https')
+    const [stream] = await once(
+      request({
+        agent: false,
+        host: address,
+        port,
+      }).end(),
+      'response'
+    )
+    await assertStream(stream)
+  },
   async https2({ address, port }) {
-    const { connect } = await import('http2')
+    const { connect } = await import('node:http2')
     const socket = connect({
       host: address,
       port,
@@ -73,7 +74,7 @@ const clients = {
     socket.close()
   },
   async tcp({ address, port }) {
-    const { connect } = await import('net')
+    const { connect } = await import('node:net')
     const socket = connect({
       host: address,
       port,
@@ -82,7 +83,7 @@ const clients = {
     await assertStream(socket)
   },
   async tls({ address, port }) {
-    const { connect } = await import('tls')
+    const { connect } = await import('node:tls')
     const socket = connect({
       host: address,
       port,
@@ -91,7 +92,7 @@ const clients = {
     await assertStream(socket)
   },
   async udp({ address, family, port }) {
-    const { createSocket } = await import('dgram')
+    const { createSocket } = await import('node:dgram')
     const socket = createSocket(
       family === 'IPv4'
         ? {
@@ -123,7 +124,7 @@ const test = () => {
           await clients.http(this.address())
           this.close()
         },
-        request(request, response) {
+        request(_request, response) {
           response.end(expected)
         },
       },
@@ -143,7 +144,7 @@ const test = () => {
           await clients.https(this.address())
           this.close()
         },
-        request(request, response) {
+        request(_request, response) {
           response.end(expected)
         },
       },
