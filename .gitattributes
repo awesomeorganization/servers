@@ -7,3 +7,4 @@
 *.yml   text eol=lf
 *.html  text eol=lf
 *.md    text eol=lf
+*.ts    text eol=lf

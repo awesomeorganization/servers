@@ -7,13 +7,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci --ignore-scripts
+      - run: npm install
       - run: npm test
     strategy:
       matrix:
         node-version:
-          - 12
-          - 14
           - 16
-name: npm-test
+name: test
 'on': push
