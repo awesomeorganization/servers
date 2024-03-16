@@ -8,7 +8,7 @@
   },
   "description": "[ESM] The easiest way to create http, http2, https, https2, tcp, tls, udp servers in Node.js",
   "devDependencies": {
-    "@commitlint/cli": "17.0.2",
+    "@commitlint/cli": "19.2.0",
     "@commitlint/config-conventional": "17.0.2",
     "eslint": "8.17.0",
     "eslint-config-prettier": "8.5.0",
