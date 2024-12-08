@@ -9,7 +9,7 @@ jobs:
           package-name: '@awesomeorganization/servers'
           release-type: node
       - if: ${{ steps.release.outputs.release_created }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ steps.release.outputs.release_created }}
